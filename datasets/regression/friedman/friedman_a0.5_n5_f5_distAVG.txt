@@ -1,0 +1,5 @@
+{
+    "jensen-shannon": 0.9999999999999915,
+    "hellinger": 1.0,
+    "earth-movers": 0.014186879516990552
+}
