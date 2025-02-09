@@ -1,5 +1,4 @@
 import numpy as np
-from networkx.algorithms.connectivity import k_edge_subgraphs
 from scipy.spatial import distance
 from collections import Counter
 

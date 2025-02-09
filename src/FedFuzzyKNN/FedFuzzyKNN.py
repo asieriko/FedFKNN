@@ -2,9 +2,10 @@ import numpy as np
 from scipy.spatial import distance
 
 class ServerFuzzyKNN:
-    def __init__(self, k=3, m=2, clients=None):
+    def __init__(self, k=3, m=2, clients=None, distance_function=distance.euclidean):
         self.k = k
         self.m = m
+        self.distance_function = distance_function
         if clients is not None:
             self.clients = clients
         else:
@@ -50,10 +51,11 @@ class ServerFuzzyKNN:
         return max(memberships, key=memberships.get)
 
 class CliFuzzyKNN:
-    def __init__(self, k=3, m=2):
+    def __init__(self, k=3, m=2, distance_function=distance.euclidean):
         self.k = k
         self.kInit = k
         self.m = m
+        self.distance_function = distance_function
 
     def fit(self, X_train, y_train):
         self.X_train = X_train
@@ -64,7 +66,7 @@ class CliFuzzyKNN:
     def _compute_memberships(self, X_train, y_train):
         memberships = []
         for i, xi in enumerate(X_train):
-            distances = [distance.euclidean(xi, x_train) for x_train in X_train]
+            distances = [self.distance_function(xi, x_train) for x_train in X_train]
             kInit_indices = np.argsort(distances)[1:self.kInit+1]  # Exclude the instance itself
             kInit_labels = [y_train[j] for j in kInit_indices]
             instance_memberships = {}
@@ -80,7 +82,7 @@ class CliFuzzyKNN:
     def predict_fed(self, X_test):
         predictions = []
         for x in X_test:
-            distances = [distance.euclidean(x, x_train) for x_train in self.X_train]
+            distances = [self.distance_function(x, x_train) for x_train in self.X_train]
             k_indices = np.argsort(distances)[:self.k]
             k_distances = [distances[i] for i in k_indices]
             k_labels = [self.y_train[i] for i in k_indices]
@@ -91,7 +93,7 @@ class CliFuzzyKNN:
     def predict(self, X_test):
         predictions = []
         for x in X_test:
-            distances = [distance.euclidean(x, x_train) for x_train in self.X_train]
+            distances = [self.distance_function(x, x_train) for x_train in self.X_train]
             k_indices = np.argsort(distances)[:self.k]
             k_distances = [distances[i] for i in k_indices]
             k_labels = [self.y_train[i] for i in k_indices]
@@ -133,10 +135,11 @@ class CliFuzzyKNN:
 
 
 class FuzzyKNN:
-    def __init__(self, k=3, m=2):
+    def __init__(self, k=3, m=2, distance_function=distance.euclidean):
         self.k = k
         self.kInit = k
         self.m = m
+        self.distance_function = distance_function
 
     def fit(self, X_train, y_train):
         self.X_train = X_train
@@ -147,7 +150,7 @@ class FuzzyKNN:
     def _compute_memberships(self, X_train, y_train):
         memberships = []
         for i, xi in enumerate(X_train):
-            distances = [distance.euclidean(xi, x_train) for x_train in X_train]
+            distances = [self.distance_function(xi, x_train) for x_train in X_train]
             kInit_indices = np.argsort(distances)[1:self.kInit+1]  # Exclude the instance itself
             kInit_labels = [y_train[j] for j in kInit_indices]
             instance_memberships = {}
@@ -164,7 +167,7 @@ class FuzzyKNN:
     def predict(self, X_test):
         predictions = []
         for x in X_test:
-            distances = [distance.euclidean(x, x_train) for x_train in self.X_train]
+            distances = [self.distance_function(x, x_train) for x_train in self.X_train]
             k_indices = np.argsort(distances)[:self.k]
             k_distances = [distances[i] for i in k_indices]
             k_labels = [self.y_train[i] for i in k_indices]
